@@ -2,6 +2,7 @@ package com.example.chrisfraser.moonrocksample;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -23,9 +24,9 @@ import rx.Observable;
 import rx.subjects.PublishSubject;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
-    private static String Module = "app/testviewmodel";
+    private final String Module = "app/testviewmodel";
 
     @Portal("addPressed") PublishSubject<Add> mAddPressed;
     @ReversePortal("addResponse") Observable<Integer> mAddResponse;
