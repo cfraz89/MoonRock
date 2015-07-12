@@ -1,10 +1,10 @@
-package com.example.chrisfraser.rxbridgetest;
+package com.example.chrisfraser.moonrocksample;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.example.chrisfraser.rxbridgetest.models.Post;
-import com.example.chrisfraser.rxbridgetest.models.PostList;
+import com.example.chrisfraser.moonrocksample.models.Post;
+import com.example.chrisfraser.moonrocksample.models.PostList;
 
 /**
  * Created by chrisfraser on 7/07/15.

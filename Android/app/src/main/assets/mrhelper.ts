@@ -1,40 +1,48 @@
-declare var System: any;
-declare var streamInterface: any;
-declare var reversePortalInterface: any;
+declare var System: any
+declare var streamInterface: any
+declare var reversePortalInterface: any
+
 
 class MRHelper {
+  window: any
+
   constructor() {
+    this.window = <any>window
+  }
+
+  getModule(loadedName: string): any {
+    return this.window[loadedName]
   }
 
   loadModule(moduleName: string, loadedName: string) {
     System.import(moduleName).then((mod: any) => {
-      (<any>window)[loadedName] = mod.default
+      this.window[loadedName] = mod.default
       streamInterface.push(true, loadedName)
-      });
+    });
   }
 
   portal(loadedName: string, subjectName: string) {
     var portal = new Rx.Subject<any>();
-    window[loadedName][subjectName] = portal;
+    this.getModule(loadedName)[subjectName] = portal;
   }
 
   activatePortal(loadedName: string, subjectName: string, serializedInput: string) {
     var data = JSON.parse(serializedInput)
-    var portal = <Rx.Subject<any>>(window[loadedName][subjectName])
+    var portal = <Rx.Subject<any>>(this.getModule(loadedName)[subjectName])
     portal.onNext(data)
   }
 
   reversePortal(loadedName: string, subjectName: string) {
     var portal = new Rx.Subject<any>();
-    window[loadedName][subjectName] = portal;
+    this.getModule(loadedName)[subjectName] = portal;
     portal.subscribe((data: any)=>{
         reversePortalInterface.onNext(JSON.stringify(data), subjectName)
       })
   }
 
   portalsGenerated(loadedName: string) {
-    window[loadedName].portalsGenerated()
+    this.getModule(loadedName).portalsGenerated()
   }
 }
 
-window['mrHelper'] = new MRHelper()
+(<any>window).mrHelper = new MRHelper()

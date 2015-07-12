@@ -1,15 +1,12 @@
-package com.example.chrisfraser.rxbridgetest.bridge;
+package com.example.chrisfraser.moonrocksample.moonrock;
 
-import android.os.Debug;
 import android.util.Log;
-import android.webkit.JavascriptInterface;
 
 import com.bluelinelabs.logansquare.LoganSquare;
 
 import java.io.IOException;
 
 import rx.Observable;
-import rx.subjects.PublishSubject;
 import rx.subjects.Subject;
 
 /**

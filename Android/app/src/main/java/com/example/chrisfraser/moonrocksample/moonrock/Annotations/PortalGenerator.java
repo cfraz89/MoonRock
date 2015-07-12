@@ -1,8 +1,7 @@
-package com.example.chrisfraser.rxbridgetest.bridge.Annotations;
+package com.example.chrisfraser.moonrocksample.moonrock.Annotations;
 
 import com.bluelinelabs.logansquare.LoganSquare;
-import com.example.chrisfraser.rxbridgetest.bridge.MRModule;
-import com.example.chrisfraser.rxbridgetest.bridge.MoonRock;
+import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

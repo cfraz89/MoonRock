@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest.bridge.Annotations;
+package com.example.chrisfraser.moonrocksample.moonrock.Annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,7 +1,7 @@
-package com.example.chrisfraser.rxbridgetest.bridge;
+package com.example.chrisfraser.moonrocksample.moonrock;
 
 import com.bluelinelabs.logansquare.LoganSquare;
-import com.example.chrisfraser.rxbridgetest.bridge.Annotations.PortalGenerator;
+import com.example.chrisfraser.moonrocksample.moonrock.Annotations.PortalGenerator;
 
 import java.io.IOException;
 import java.util.UUID;

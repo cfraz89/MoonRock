@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest;
+package com.example.chrisfraser.moonrocksample;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

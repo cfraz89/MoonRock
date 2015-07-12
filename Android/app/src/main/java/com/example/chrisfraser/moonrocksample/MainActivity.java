@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest;
+package com.example.chrisfraser.moonrocksample;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -9,12 +9,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.chrisfraser.rxbridgetest.bridge.Annotations.Portal;
-import com.example.chrisfraser.rxbridgetest.bridge.Annotations.ReversePortal;
-import com.example.chrisfraser.rxbridgetest.bridge.MRModule;
-import com.example.chrisfraser.rxbridgetest.bridge.MoonRock;
-import com.example.chrisfraser.rxbridgetest.models.Add;
-import com.example.chrisfraser.rxbridgetest.models.PostList;
+import com.example.chrisfraser.moonrocksample.moonrock.Annotations.Portal;
+import com.example.chrisfraser.moonrocksample.moonrock.Annotations.ReversePortal;
+import com.example.chrisfraser.moonrocksample.moonrock.MRModule;
+import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
+import com.example.chrisfraser.moonrocksample.models.Add;
+import com.example.chrisfraser.moonrocksample.models.PostList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

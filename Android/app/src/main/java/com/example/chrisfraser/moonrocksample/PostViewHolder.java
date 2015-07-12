@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest;
+package com.example.chrisfraser.moonrocksample;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

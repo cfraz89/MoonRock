@@ -9,6 +9,7 @@
         "./app/testviewmodel.ts",
         "./moonrock.ts",
         "./moonrockportals.ts",
-        "./mrhelper.ts"
+        "./mrhelper.ts",
+        "./typings.d.ts"
     ]
 }

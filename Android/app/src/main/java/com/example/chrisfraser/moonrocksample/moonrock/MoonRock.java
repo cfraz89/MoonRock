@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest.bridge;
+package com.example.chrisfraser.moonrocksample.moonrock;
 
 import android.content.Context;
 import android.webkit.ValueCallback;

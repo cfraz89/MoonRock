@@ -16,4 +16,4 @@ var testViewModel = (function () {
     return testViewModel;
 })();
 exports.testViewModel = testViewModel;
-exports.default = (new testViewModel());
+exports["default"] = (new testViewModel());

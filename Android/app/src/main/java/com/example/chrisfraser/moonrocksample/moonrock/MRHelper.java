@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest.bridge;
+package com.example.chrisfraser.moonrocksample.moonrock;
 
 /**
  * Created by chrisfraser on 13/07/15.

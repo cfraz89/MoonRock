@@ -1,4 +1,4 @@
-package com.example.chrisfraser.rxbridgetest.bridge.Annotations;
+package com.example.chrisfraser.moonrocksample.moonrock.Annotations;
 
 /**
  * Created by chrisfraser on 12/07/15.
