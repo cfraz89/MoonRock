@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./bower_components"
+    ],
+    "files": [
+        "./app/testmodel.ts",
+        "./app/testviewmodel.ts",
+        "./bower_components/axios/axios.d.ts",
+        "./bower_components/system.js/test/tests/testpkg/test.ts",
+        "./bower_components/system.js/test/tests/typescript.ts",
+        "./bridge.ts"
+    ]
+}
