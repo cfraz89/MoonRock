@@ -1,0 +1,3 @@
+interface MoonRockPortals {
+  portalsGenerated(): any
+}

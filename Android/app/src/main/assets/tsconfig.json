@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true
+    },
+    "files": [
+        "./app/testmodel.ts",
+        "./app/testviewmodel.ts",
+        "./moonrock.ts",
+        "./moonrockportals.ts",
+        "./mrhelper.ts"
+    ]
+}
