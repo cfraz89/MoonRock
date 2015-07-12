@@ -21,6 +21,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.Observer;
 import rx.subjects.PublishSubject;
 
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final String Module = "app/testviewmodel";
 
-    @Portal PublishSubject<Add> addPressed;
+    @Portal Observer<Add> addPressed;
     @ReversePortal Observable<Integer> addResponse;
     @ReversePortal Observable<PostList> postsResponse;
 
