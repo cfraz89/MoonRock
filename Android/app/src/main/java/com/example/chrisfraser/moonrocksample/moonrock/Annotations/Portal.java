@@ -11,5 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Portal {
-    String name() default "";
+    String value() default "";
+    Direction direction() default Direction.Auto;
 }

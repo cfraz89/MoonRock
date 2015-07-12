@@ -1,9 +1,9 @@
 /// <reference path="../bower_components/axios/axios.d.ts" />
 /// <reference path="../bower_components/rxjs/ts/rx.d.ts" />
 
-import axios = require('axios');
+import axios = require('axios')
 
-export class testViewModel implements MoonRockPortals {
+export class appModule implements MoonRockPortals {
   addPressed: Rx.Observable<{input1: number, input2: number}>
   addResponse: Rx.Observer<number>
   postsResponse: Rx.Observer<{data: any}>
@@ -19,4 +19,4 @@ export class testViewModel implements MoonRockPortals {
   }
 }
 
-export default (new testViewModel())
+export default (new appModule())

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
+import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
 
@@ -30,20 +32,16 @@ public class PortalGenerator {
                 try {
                     field.setAccessible(true);
                     PublishSubject subject = PublishSubject.create();
-                    field.set(host, subject);
-                    String name = portal.name().isEmpty() ? field.getName() : portal.name();
-                    portal(subject, name);
-                } catch (Exception e) {
-                }
-            }
-            ReversePortal reversePortal = field.getAnnotation(ReversePortal.class);
-            if (reversePortal != null) {
-                try {
-                    field.setAccessible(true);
-                    PublishSubject subject = PublishSubject.create();
-                    field.set(host, subject.observeOn(AndroidSchedulers.mainThread()));
-                    String name = reversePortal.name().isEmpty() ? field.getName() : reversePortal.name();
-                    reversePortal(subject, name, classForField(field));
+                    String name = portal.value().isEmpty() ? field.getName() : portal.value();
+                    if (portal.direction() == Direction.Auto && field.getType() == Observer.class
+                            || portal.direction() == Direction.Forward) {
+                        field.set(host, subject);
+                        portal(subject, name);
+                    } else if (portal.direction() == Direction.Auto && field.getType() == Observable.class
+                            | portal.direction() == Direction.Reverse) {
+                        field.set(host, subject.observeOn(AndroidSchedulers.mainThread()));
+                        reversePortal(subject, name, classForField(field));
+                    }
                 } catch (Exception e) {
                 }
             }

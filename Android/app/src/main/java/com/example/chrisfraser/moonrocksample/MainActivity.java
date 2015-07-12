@@ -11,7 +11,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.chrisfraser.moonrocksample.moonrock.Annotations.Portal;
-import com.example.chrisfraser.moonrocksample.moonrock.Annotations.ReversePortal;
 import com.example.chrisfraser.moonrocksample.moonrock.MRModule;
 import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
 import com.example.chrisfraser.moonrocksample.models.Add;
@@ -27,11 +26,13 @@ import rx.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String Module = "app/testviewmodel";
+    private final String Module = "app/appmodule";
 
+    //Forward
     @Portal Observer<Add> addPressed;
-    @ReversePortal Observable<Integer> addResponse;
-    @ReversePortal Observable<PostList> postsResponse;
+    //Reverse
+    @Portal Observable<Integer> addResponse;
+    @Portal Observable<PostList> postsResponse;
 
     @Bind(R.id.returnText) TextView mTextView;
     @Bind(R.id.recycler) RecyclerView mRecycler;

@@ -1,3 +1,0 @@
-interface TestModel {
-  variable: string;
-}
