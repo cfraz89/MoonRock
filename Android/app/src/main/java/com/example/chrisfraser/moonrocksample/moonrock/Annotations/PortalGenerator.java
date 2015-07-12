@@ -31,7 +31,8 @@ public class PortalGenerator {
                     field.setAccessible(true);
                     PublishSubject subject = PublishSubject.create();
                     field.set(host, subject);
-                    portal(subject, portal.value());
+                    String name = portal.name().isEmpty() ? field.getName() : portal.name();
+                    portal(subject, name);
                 } catch (Exception e) {
                 }
             }
@@ -41,7 +42,8 @@ public class PortalGenerator {
                     field.setAccessible(true);
                     PublishSubject subject = PublishSubject.create();
                     field.set(host, subject.observeOn(AndroidSchedulers.mainThread()));
-                    reversePortal(subject, reversePortal.value(), classForField(field));
+                    String name = reversePortal.name().isEmpty() ? field.getName() : reversePortal.name();
+                    reversePortal(subject, name, classForField(field));
                 } catch (Exception e) {
                 }
             }

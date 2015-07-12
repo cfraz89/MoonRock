@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     private final String Module = "app/testviewmodel";
 
-    @Portal("addPressed") PublishSubject<Add> mAddPressed;
-    @ReversePortal("addResponse") Observable<Integer> mAddResponse;
-    @ReversePortal("postsResponse") Observable<PostList> mPostsResponse;
+    @Portal PublishSubject<Add> addPressed;
+    @ReversePortal Observable<Integer> addResponse;
+    @ReversePortal Observable<PostList> postsResponse;
 
     @Bind(R.id.returnText) TextView mTextView;
     @Bind(R.id.recycler) RecyclerView mRecycler;
@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void setupBehaviour(MRModule module) {
-        mAddResponse.subscribe(data->mTextView.setText(data.toString()));
+        addResponse.subscribe(data->mTextView.setText(data.toString()));
 
-        mPostsResponse.subscribe(data -> {
+        postsResponse.subscribe(data -> {
             mProgressBar.setVisibility(View.GONE);
             mRecycler.setVisibility(View.VISIBLE);
             mRecycler.setAdapter(new PostsAdapter(data));
@@ -61,6 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addButton)
     public void button1Clicked() {
-        mAddPressed.onNext(new Add(mAdd1.getText().toString(), mAdd2.getText().toString()));
+        addPressed.onNext(new Add(mAdd1.getText().toString(), mAdd2.getText().toString()));
     }
 }

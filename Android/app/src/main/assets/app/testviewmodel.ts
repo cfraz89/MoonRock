@@ -4,7 +4,7 @@
 import axios = require('axios');
 
 export class testViewModel implements MoonRockPortals {
-  addPressed: Rx.Subject<{input1: number, input2: number}>
+  addPressed: Rx.Observable<{input1: number, input2: number}>
   addResponse: Rx.Subject<number>
   postsResponse: Rx.Subject<{data: any}>
 
