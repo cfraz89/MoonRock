@@ -17,12 +17,13 @@ public class MRModule {
     private PortalGenerator mPortalGenerator;
     private AsyncSubject<MRModule> mReadySubject;
     private MoonRock mMoonRock;
+    private Object mPortalHost;
     String mLoadedName;
 
-    public MRModule(MoonRock moonRock, String module, AsyncSubject<MRModule> readySubject) {
+    public MRModule(MoonRock moonRock, String module, Object portalHost, AsyncSubject<MRModule> readySubject) {
         mMoonRock = moonRock;
         mReadySubject = readySubject;
-        mPortalGenerator = new PortalGenerator(moonRock);
+        mPortalGenerator = new PortalGenerator(moonRock, portalHost);
         load(module);
     }
 
@@ -57,17 +58,18 @@ public class MRModule {
         return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
-    String nameForInstance(String module) {
+    private String nameForInstance(String module) {
         return String.format("instance_%s_%s", module.replace("/", "_"), UUID.randomUUID().toString().replace("-", "_"));
     }
 
-    void load(String module) {
+    private void load(String module) {
         mLoadedName = nameForInstance(module);
         mPortalGenerator.setLoadedName(mLoadedName);
         String loadScript = String.format("mrHelper.loadModule('%s', '%s')", module, mLoadedName);
 
         MRStream<String> loadedStream = mMoonRock.getStreams().makeStream(mLoadedName, String.class);
-        loadedStream.getObservable().subscribe(r -> {
+        loadedStream.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(r -> {
+            mPortalGenerator.generatePortals();
             mReadySubject.onNext(this);
             mReadySubject.onCompleted();
         });

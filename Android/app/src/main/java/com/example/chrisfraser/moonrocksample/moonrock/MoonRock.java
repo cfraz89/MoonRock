@@ -5,6 +5,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,18 +30,14 @@ public class MoonRock {
 
     private Map<String, MRModule> mLoadedModules;
 
-    public static Observable<MRModule> createWithModule(Context context, Map<Object, String> extensions, String moduleName, Object portalHost) {
-        AsyncSubject<MRModule> readySubject = AsyncSubject.create();
-        MoonRock moonRock = new MoonRock(context, extensions);
-        moonRock.ready().subscribe(mr-> {
-            mr.loadModule(moduleName, readySubject);
-        });
-        if (portalHost != null)
-            readySubject.observeOn(AndroidSchedulers.mainThread()).subscribe(module -> module.getPortalGenerator().generatePortals(portalHost));
-        return readySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
+    private boolean mNeedsLoad;
+
+    public static Observable<MRModule> createWithModule(Context context, String moduleName, Object portalHost) {
+        Observable<MRModule> moduleReady = new MoonRock(context).loadModule(moduleName, portalHost);
+        return moduleReady;
     }
 
-    public MoonRock(Context context, Map<Object, String> extensions)
+    public MoonRock(Context context)
     {
         mContext = context;
         mStreamManager = new MRStreamManager();
@@ -48,11 +45,8 @@ public class MoonRock {
         mLoadedModules = new HashMap<>();
         mWebView = new WebView(mContext);
         setupWebView();
-        addExtensions(extensions);
         mReadySubject = AsyncSubject.create();
-
-        mWebView.loadUrl("file:///android_asset/moonrock.html");
-
+        mNeedsLoad = true;
     }
 
     private void setupWebView() {
@@ -68,28 +62,46 @@ public class MoonRock {
         });
     }
 
-    private void addExtensions(Map<Object, String> extensions) {
+    private void addDefaultExtensions() {
         mWebView.addJavascriptInterface(mStreamManager, "streamInterface");
         mWebView.addJavascriptInterface(mMRReversePortalManager, "reversePortalInterface");
-        if (extensions != null) {
-            for (Map.Entry<Object, String> extension : extensions.entrySet())
-                mWebView.addJavascriptInterface(extension.getKey(), extension.getValue());
-        }
+
     }
 
     public Observable<MoonRock> ready() {
         return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MRModule> loadModule(String module) {
+    public Observable<MRModule> loadModule(String module, Object portalHost) {
+        if (mNeedsLoad) {
+            load();
+        }
         AsyncSubject<MRModule> readySubject = AsyncSubject.create();
-        loadModule(module, readySubject);
+        loadModule(module, portalHost, readySubject);
         return readySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void loadModule(String moduleName, AsyncSubject<MRModule> readySubject) {
-        readySubject.subscribe(module -> mLoadedModules.put(module.getLoadedName(), module));
-        MRModule mrModule = new MRModule(this, moduleName, readySubject);
+    public void registerExtensions(Map<Object, String> extensions) {
+        if (extensions != null) {
+            for (Map.Entry<Object, String> extension : extensions.entrySet())
+                mWebView.addJavascriptInterface(extension.getKey(), extension.getValue());
+        }
+    }
+
+    private void load() {
+        addDefaultExtensions();
+        mNeedsLoad = false;
+        mWebView.loadUrl("file:///android_asset/moonrock.html");
+    }
+
+    public void loadModule(String moduleName, Object portalHost, AsyncSubject<MRModule> moduleReadySubject) {
+        if (mNeedsLoad) {
+            load();
+        }
+        mReadySubject.subscribe(moonRock ->{
+            MRModule module = new MRModule(this, moduleName, portalHost, moduleReadySubject);
+            mLoadedModules.put(module.getLoadedName(), module);
+        });
     }
 
     public MRModule getModule(String loadedName) {

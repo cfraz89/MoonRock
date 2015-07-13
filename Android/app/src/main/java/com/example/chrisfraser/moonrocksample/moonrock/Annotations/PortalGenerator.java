@@ -14,19 +14,21 @@ import rx.subjects.PublishSubject;
 
 public class PortalGenerator {
     private final MoonRock mMoonRock;
+    private final Object mPortalHost;
 
     private String mLoadedName;
 
-    public PortalGenerator(MoonRock moonRock) {
+    public PortalGenerator(MoonRock moonRock, Object portalHost) {
         this.mMoonRock = moonRock;
+        this.mPortalHost = portalHost;
     }
 
     public void setLoadedName(String loadedName) {
         mLoadedName = loadedName;
     }
 
-    public <T> void generatePortals(Object host) {
-        for (Field field : host.getClass().getDeclaredFields()) {
+    public <T> void generatePortals() {
+        for (Field field : mPortalHost.getClass().getDeclaredFields()) {
             Portal portal = field.getAnnotation(Portal.class);
             if (portal != null) {
                 try {
@@ -35,11 +37,11 @@ public class PortalGenerator {
                     String name = portal.value().isEmpty() ? field.getName() : portal.value();
                     if (portal.direction() == Direction.Auto && field.getType() == Observer.class
                             || portal.direction() == Direction.Forward) {
-                        field.set(host, subject);
+                        field.set(mPortalHost, subject);
                         portal(subject, name);
                     } else if (portal.direction() == Direction.Auto && field.getType() == Observable.class
                             | portal.direction() == Direction.Reverse) {
-                        field.set(host, subject.observeOn(AndroidSchedulers.mainThread()));
+                        field.set(mPortalHost, subject.observeOn(AndroidSchedulers.mainThread()));
                         reversePortal(subject, name, classForField(field));
                     }
                 } catch (Exception e) {

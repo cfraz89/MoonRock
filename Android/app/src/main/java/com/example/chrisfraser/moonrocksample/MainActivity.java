@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MoonRock.createWithModule(this, null, Module, this).subscribe(this::setupBehaviour);
+        new MoonRock(this).loadModule(Module, this).subscribe(this::setupBehaviour);
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
