@@ -13,18 +13,22 @@ import rx.subjects.AsyncSubject;
 /**
  * Created by chrisfraser on 8/07/15.
  */
-public class MRModule {
+public class MoonRockModule {
     private PortalGenerator mPortalGenerator;
-    private AsyncSubject<MRModule> mReadySubject;
+    private AsyncSubject<MoonRockModule> mReadySubject;
     private MoonRock mMoonRock;
     private Object mPortalHost;
     String mLoadedName;
 
-    public MRModule(MoonRock moonRock, String module, Object portalHost, AsyncSubject<MRModule> readySubject) {
+    public MoonRockModule(MoonRock moonRock, String module, Object portalHost, AsyncSubject<MoonRockModule> readySubject) {
         mMoonRock = moonRock;
         mReadySubject = readySubject;
         mPortalGenerator = new PortalGenerator(moonRock, portalHost);
         load(module);
+    }
+
+    public MoonRock getMoonRock() {
+        return mMoonRock;
     }
 
     public <T> Observable<T> function(String functionName, Class<T> unpackClass, Object... args)
@@ -54,7 +58,7 @@ public class MRModule {
         return script.toString();
     }
 
-    public Observable<MRModule> ready() {
+    public Observable<MoonRockModule> ready() {
         return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -75,6 +79,10 @@ public class MRModule {
         });
 
         mMoonRock.runJS(loadScript, null);
+    }
+
+    public <T> void subscribeOnActivity(Observable<T> observable) {
+
     }
 
     public String getLoadedName() {

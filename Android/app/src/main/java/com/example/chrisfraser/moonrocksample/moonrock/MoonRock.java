@@ -5,7 +5,6 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +27,12 @@ public class MoonRock {
 
     private AsyncSubject<MoonRock> mReadySubject;
 
-    private Map<String, MRModule> mLoadedModules;
+    private Map<String, MoonRockModule> mLoadedModules;
 
     private boolean mNeedsLoad;
 
-    public static Observable<MRModule> createWithModule(Context context, String moduleName, Object portalHost) {
-        Observable<MRModule> moduleReady = new MoonRock(context).loadModule(moduleName, portalHost);
+    public static Observable<MoonRockModule> createWithModule(Context context, String moduleName, Object portalHost) {
+        Observable<MoonRockModule> moduleReady = new MoonRock(context).loadModule(moduleName, portalHost);
         return moduleReady;
     }
 
@@ -72,11 +71,11 @@ public class MoonRock {
         return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MRModule> loadModule(String module, Object portalHost) {
+    public Observable<MoonRockModule> loadModule(String module, Object portalHost) {
         if (mNeedsLoad) {
             load();
         }
-        AsyncSubject<MRModule> readySubject = AsyncSubject.create();
+        AsyncSubject<MoonRockModule> readySubject = AsyncSubject.create();
         loadModule(module, portalHost, readySubject);
         return readySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
@@ -94,17 +93,17 @@ public class MoonRock {
         mWebView.loadUrl("file:///android_asset/moonrock.html");
     }
 
-    public void loadModule(String moduleName, Object portalHost, AsyncSubject<MRModule> moduleReadySubject) {
+    public void loadModule(String moduleName, Object portalHost, AsyncSubject<MoonRockModule> moduleReadySubject) {
         if (mNeedsLoad) {
             load();
         }
         mReadySubject.subscribe(moonRock ->{
-            MRModule module = new MRModule(this, moduleName, portalHost, moduleReadySubject);
+            MoonRockModule module = new MoonRockModule(this, moduleName, portalHost, moduleReadySubject);
             mLoadedModules.put(module.getLoadedName(), module);
         });
     }
 
-    public MRModule getModule(String loadedName) {
+    public MoonRockModule getModule(String loadedName) {
         return mLoadedModules.get(loadedName);
     }
 
