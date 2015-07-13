@@ -1,4 +1,4 @@
-package com.example.chrisfraser.moonrocksample.moonrock.notannotations;
+package com.example.chrisfraser.moonrocksample.moonrock.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

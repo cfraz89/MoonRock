@@ -6,13 +6,17 @@ import com.bluelinelabs.logansquare.annotation.JsonObject;
 /**
  * Created by chrisfraser on 7/07/15.
  */
-@JsonObject
 public class Post {
-    @JsonField
     String title;
-
-    @JsonField
     String body;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
 
     public String getTitle() {
         return title;

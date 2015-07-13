@@ -10,8 +10,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.chrisfraser.moonrocksample.moonrock.notannotations.Portal;
-import com.example.chrisfraser.moonrocksample.moonrock.notannotations.ReversePortal;
+import com.example.chrisfraser.moonrocksample.moonrock.annotations.Portal;
+import com.example.chrisfraser.moonrocksample.moonrock.annotations.ReversePortal;
 import com.example.chrisfraser.moonrocksample.moonrock.MoonRockModule;
 import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
 import com.example.chrisfraser.moonrocksample.models.PostList;

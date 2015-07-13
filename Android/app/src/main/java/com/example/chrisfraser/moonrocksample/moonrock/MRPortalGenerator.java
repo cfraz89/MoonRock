@@ -1,7 +1,7 @@
 package com.example.chrisfraser.moonrocksample.moonrock;
 
-import com.example.chrisfraser.moonrocksample.moonrock.notannotations.Portal;
-import com.example.chrisfraser.moonrocksample.moonrock.notannotations.ReversePortal;
+import com.example.chrisfraser.moonrocksample.moonrock.annotations.Portal;
+import com.example.chrisfraser.moonrocksample.moonrock.annotations.ReversePortal;
 import com.example.chrisfraser.moonrocksample.moonrock.serializers.OnClickSerializer;
 import com.example.chrisfraser.moonrocksample.moonrock.serializers.OnTextChangedSerializer;
 import com.google.gson.Gson;
