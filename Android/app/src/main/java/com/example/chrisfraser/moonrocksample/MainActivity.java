@@ -10,36 +10,38 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.chrisfraser.moonrocksample.moonrock.Annotations.Portal;
-import com.example.chrisfraser.moonrocksample.moonrock.Annotations.ReversePortal;
+import com.example.chrisfraser.moonrocksample.moonrock.notannotations.Portal;
+import com.example.chrisfraser.moonrocksample.moonrock.notannotations.ReversePortal;
 import com.example.chrisfraser.moonrocksample.moonrock.MoonRockModule;
 import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
-import com.example.chrisfraser.moonrocksample.models.Add;
 import com.example.chrisfraser.moonrocksample.models.PostList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscription;
 import rx.android.app.AppObservable;
+import rx.android.view.OnClickEvent;
 import rx.android.view.ViewObservable;
-import rx.subjects.PublishSubject;
+import rx.android.widget.OnTextChangeEvent;
+import rx.android.widget.WidgetObservable;
 
 
 public class MainActivity extends AppCompatActivity {
     MoonRock mMoonRock;
     Observable<MoonRockModule> mModuleObservable;
 
-    @Portal PublishSubject<Add> addPressed;
+    @Portal Observable<OnClickEvent> addPressed;
+    @Portal Observable<OnTextChangeEvent> add1Text;
+    @Portal Observable<OnTextChangeEvent> add2Text;
     @ReversePortal Observable<Integer> addResponse;
     @ReversePortal Observable<PostList> postsResponse;
 
     Subscription mTextSubscription;
     Subscription mPostResponseSubscription;
 
-    @Bind(R.id.addButton) Button addButton;
+    @Bind(R.id.addButton) Button mAddButton;
     @Bind(R.id.returnText) TextView mTextView;
     @Bind(R.id.recycler) RecyclerView mRecycler;
     @Bind(R.id.progressBar) ProgressBar mProgressBar;
@@ -52,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
         setupView();
 
-        addPressed = PublishSubject.create();
+        addPressed = ViewObservable.clicks(mAddButton);
+        add1Text = WidgetObservable.text(mAdd1);
+        add2Text = WidgetObservable.text(mAdd2);
 
         mMoonRock = new MoonRock(this);
         mModuleObservable = mMoonRock.loadModule("app/appmodule", this);
@@ -81,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.addButton)
     public void button1Clicked() {
-        addPressed.onNext(new Add(mAdd1.getText().toString(), mAdd2.getText().toString()));
+        //addPressed.onNext(new Add(mAdd1.getText().toString(), mAdd2.getText().toString()));
     }
 
     @Override

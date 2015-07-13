@@ -1,26 +1,35 @@
-package com.example.chrisfraser.moonrocksample.moonrock.Annotations;
+package com.example.chrisfraser.moonrocksample.moonrock;
 
-import com.bluelinelabs.logansquare.LoganSquare;
-import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
+import com.example.chrisfraser.moonrocksample.moonrock.notannotations.Portal;
+import com.example.chrisfraser.moonrocksample.moonrock.notannotations.ReversePortal;
+import com.example.chrisfraser.moonrocksample.moonrock.serializers.OnClickSerializer;
+import com.example.chrisfraser.moonrocksample.moonrock.serializers.OnTextChangedSerializer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
 import rx.Observable;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.android.view.OnClickEvent;
+import rx.android.widget.OnTextChangeEvent;
 import rx.subjects.PublishSubject;
 
-public class PortalGenerator {
+public class MRPortalGenerator {
     private final MoonRock mMoonRock;
     private final Object mPortalHost;
+    private final Gson mGson;
 
     private String mLoadedName;
 
-    public PortalGenerator(MoonRock moonRock, Object portalHost) {
+    public MRPortalGenerator(MoonRock moonRock, Object portalHost) {
         this.mMoonRock = moonRock;
         this.mPortalHost = portalHost;
+        this.mGson = new GsonBuilder()
+                .registerTypeAdapter(OnClickEvent.class, new OnClickSerializer())
+                .registerTypeAdapter(OnTextChangeEvent.class, new OnTextChangedSerializer())
+                .create();
     }
 
     public void setLoadedName(String loadedName) {
@@ -73,12 +82,12 @@ public class PortalGenerator {
         String createScript = String.format("mrHelper.portal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(createScript, null);
 
-        observable.subscribe(input -> {
+        observable.observeOn(AndroidSchedulers.mainThread()).subscribe(input -> {
             try {
-                String serializedInput = input != null ? LoganSquare.serialize(input) : "null";
+                String serializedInput = input != null ? mGson.toJson(input) : "null";
                 String mirrorScript = String.format("mrHelper.activatePortal('%s', '%s', '%s')", mLoadedName, name, serializedInput);
                 mMoonRock.runJS(mirrorScript, null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

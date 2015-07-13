@@ -1,7 +1,6 @@
 package com.example.chrisfraser.moonrocksample.moonrock;
 
 import com.bluelinelabs.logansquare.LoganSquare;
-import com.example.chrisfraser.moonrocksample.moonrock.Annotations.PortalGenerator;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -14,7 +13,7 @@ import rx.subjects.AsyncSubject;
  * Created by chrisfraser on 8/07/15.
  */
 public class MoonRockModule {
-    private PortalGenerator mPortalGenerator;
+    private MRPortalGenerator mPortalGenerator;
     private AsyncSubject<MoonRockModule> mReadySubject;
     private MoonRock mMoonRock;
     private Object mPortalHost;
@@ -23,7 +22,7 @@ public class MoonRockModule {
     public MoonRockModule(MoonRock moonRock, String module, Object portalHost, AsyncSubject<MoonRockModule> readySubject) {
         mMoonRock = moonRock;
         mReadySubject = readySubject;
-        mPortalGenerator = new PortalGenerator(moonRock, portalHost);
+        mPortalGenerator = new MRPortalGenerator(moonRock, portalHost);
         load(module);
     }
 
@@ -89,7 +88,7 @@ public class MoonRockModule {
         return mLoadedName;
     }
 
-    public PortalGenerator getPortalGenerator() {
+    public MRPortalGenerator getPortalGenerator() {
         return mPortalGenerator;
     }
 }

@@ -6,8 +6,7 @@ var appModule = (function () {
     }
     appModule.prototype.portalsGenerated = function () {
         var _this = this;
-        this.addPressed.subscribe(function (add) {
-            _this.addResponse.onNext(add.input1 + add.input2);
+        this.addPressed.subscribe(function (event) {
         });
         axios.get('http://jsonplaceholder.typicode.com/posts').then(function (response) {
             _this.postsResponse.onNext({ data: response.data });
@@ -16,4 +15,4 @@ var appModule = (function () {
     return appModule;
 })();
 exports.appModule = appModule;
-exports["default"] = (new appModule());
+exports.default = (new appModule());

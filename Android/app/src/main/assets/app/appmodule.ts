@@ -4,13 +4,16 @@
 import axios = require('axios')
 
 export class appModule implements MoonRockPortals {
-  addPressed: Rx.Observable<{input1: number, input2: number}>
+  addPressed: Rx.Observable<any>
+  add1Text: Rx.Observable<any>
+  add2Text: Rx.Observable<any>
+
   addResponse: Rx.Observer<number>
   postsResponse: Rx.Observer<{data: any}>
 
   portalsGenerated() {
-    this.addPressed.subscribe(add=>{
-      this.addResponse.onNext(add.input1 + add.input2)
+    this.addPressed.subscribe(event=>{
+
     })
 
     axios.get('http://jsonplaceholder.typicode.com/posts').then((response: axios.Response) => {

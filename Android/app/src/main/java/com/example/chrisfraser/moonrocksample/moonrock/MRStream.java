@@ -3,6 +3,7 @@ package com.example.chrisfraser.moonrocksample.moonrock;
 import android.util.Log;
 
 import com.bluelinelabs.logansquare.LoganSquare;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -15,20 +16,17 @@ import rx.subjects.Subject;
 public class MRStream<T> {
     private Subject<T, T> mStreamSubject;
     private Class<T> mUnpackClass;
+    Gson mGson;
     public MRStream(Subject<T, T> streamSubject, Class<T> unpackClass)
     {
         mStreamSubject = streamSubject;
         mUnpackClass = unpackClass;
+        mGson = new Gson();
     }
 
     public void push(String data) {
-        if (mUnpackClass == String.class)
-            mStreamSubject.onNext((T)deString(data));
-        else if(mUnpackClass == Integer.class)
-            mStreamSubject.onNext((T)new Integer(data));
-        else {
             try {
-                T value = LoganSquare.parse(data, mUnpackClass);
+                T value = mGson.fromJson(data, mUnpackClass);
                 if (value != null)
                     mStreamSubject.onNext(value);
                 else {
@@ -36,15 +34,10 @@ public class MRStream<T> {
                     Log.d("moonRock", error);
                     mStreamSubject.onError(new Exception(error));
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 mStreamSubject.onError(e);
             }
-        }
-    }
-
-    String deString(String data) {
-        return data.substring(1, data.length() - 1);
     }
 
     public Observable<T> getObservable() {
