@@ -45,7 +45,7 @@ public class MRPortalGenerator {
             }
         }
         this.portalsGenerated();
-        
+
         for (Field field : fields) {
             ReversePortal reversePortal = field.getAnnotation(ReversePortal.class);
             if (reversePortal != null) {
