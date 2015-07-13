@@ -72,7 +72,6 @@ public class MoonRockModule {
 
         MRStream<String> loadedStream = mMoonRock.getStreams().makeStream(mLoadedName, String.class);
         loadedStream.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(r -> {
-            mPortalGenerator.generatePortals();
             mReadySubject.onNext(this);
             mReadySubject.onCompleted();
         });

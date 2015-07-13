@@ -3,22 +3,32 @@
 
 import axios = require('axios')
 
-export class appModule implements MoonRockPortals {
-  addPressed: Rx.Observable<any>
-  add1Text: Rx.Observable<any>
-  add2Text: Rx.Observable<any>
+function toNumber(source: string): number {
+  var num = parseInt(source)
+  return isNaN(num) ? 0 : num
+}
 
-  addResponse: Rx.Observer<number>
-  postsResponse: Rx.Observer<{data: any}>
+export class appModule implements MoonRockPortals {
+  static PostsUrl = 'http://jsonplaceholder.typicode.com/posts'
+
+  //Forwards portals
+  addPressed: Rx.Observable<any>
+  add1Text: Rx.Observable<string>
+  add2Text: Rx.Observable<string>
+
+  //Reverse portals
+  sum: Rx.Observable<string>
+  posts: Rx.Observable<any>
 
   portalsGenerated() {
-    this.addPressed.subscribe(event=>{
+    var add1Num = this.add1Text.map(toNumber);
+    var add2Num = this.add2Text.map(toNumber);
+    var sumStream = add1Num.combineLatest(add2Num, (num1, num2) => (num1 + num2).toString())
+    this.sum = this.addPressed.withLatestFrom(sumStream, (ev, num) => num)
+    this.posts = Rx.Observable.fromPromise(axios.get(appModule.PostsUrl));
+  }
 
-    })
-
-    axios.get('http://jsonplaceholder.typicode.com/posts').then((response: axios.Response) => {
-      this.postsResponse.onNext({data: response.data})
-    })
+  portalsLinked() {
   }
 }
 

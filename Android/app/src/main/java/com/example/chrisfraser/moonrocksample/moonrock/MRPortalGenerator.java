@@ -37,17 +37,22 @@ public class MRPortalGenerator {
     }
 
     public <T> void generatePortals() {
-        for (Field field : mPortalHost.getClass().getDeclaredFields()) {
+        Field[] fields = mPortalHost.getClass().getDeclaredFields();
+        for (Field field : fields) {
             Portal portal = field.getAnnotation(Portal.class);
             if (portal != null) {
                 portalFromAnnotation(field, portal);
             }
+        }
+        this.portalsGenerated();
+        
+        for (Field field : fields) {
             ReversePortal reversePortal = field.getAnnotation(ReversePortal.class);
             if (reversePortal != null) {
                 reversePortalFromAnnotation(field, reversePortal);
             }
         }
-        this.portalsGenerated();
+        this.portalsLinked();
     }
 
     private void portalFromAnnotation(Field field, Portal portal) {
@@ -100,8 +105,17 @@ public class MRPortalGenerator {
         mMoonRock.runJS(reverseScript, null);
     }
 
+    //Call after forwards portals have been setup
     public void portalsGenerated() {
         String finishedScript = String.format("mrHelper.portalsGenerated('%s')", mLoadedName);
         mMoonRock.runJS(finishedScript, null);
     }
+
+    //Cal after reverse portals have been linked
+    public void portalsLinked() {
+        String finishedScript = String.format("mrHelper.portalsLinked('%s')", mLoadedName);
+        mMoonRock.runJS(finishedScript, null);
+    }
+
+
 }

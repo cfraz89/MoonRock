@@ -22,14 +22,16 @@ var MRHelper = (function () {
         portal.onNext(data);
     };
     MRHelper.prototype.reversePortal = function (loadedName, subjectName) {
-        var portal = new Rx.Subject();
-        this.getModule(loadedName)[subjectName] = portal;
+        var portal = (this.getModule(loadedName)[subjectName]);
         portal.subscribe(function (data) {
             reversePortalInterface.onNext(JSON.stringify(data), subjectName);
         });
     };
     MRHelper.prototype.portalsGenerated = function (loadedName) {
         this.getModule(loadedName).portalsGenerated();
+    };
+    MRHelper.prototype.portalsLinked = function (loadedName) {
+        this.getModule(loadedName).portalsLinked();
     };
     return MRHelper;
 })();

@@ -33,15 +33,16 @@ class MRHelper {
   }
 
   reversePortal(loadedName: string, subjectName: string) {
-    var portal = new Rx.Subject<any>();
-    this.getModule(loadedName)[subjectName] = portal;
+    var portal = <Rx.Observable<any>>(this.getModule(loadedName)[subjectName]);
     portal.subscribe((data: any)=>{
         reversePortalInterface.onNext(JSON.stringify(data), subjectName)
       })
   }
-
   portalsGenerated(loadedName: string) {
     this.getModule(loadedName).portalsGenerated()
+  }
+  portalsLinked(loadedName: string) {
+    this.getModule(loadedName).portalsLinked()
   }
 }
 
