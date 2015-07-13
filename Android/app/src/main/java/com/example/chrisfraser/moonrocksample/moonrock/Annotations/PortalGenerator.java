@@ -31,35 +31,49 @@ public class PortalGenerator {
         for (Field field : mPortalHost.getClass().getDeclaredFields()) {
             Portal portal = field.getAnnotation(Portal.class);
             if (portal != null) {
-                try {
-                    field.setAccessible(true);
-                    PublishSubject subject = PublishSubject.create();
-                    String name = portal.value().isEmpty() ? field.getName() : portal.value();
-                    if (portal.direction() == Direction.Auto && field.getType() == Observer.class
-                            || portal.direction() == Direction.Forward) {
-                        field.set(mPortalHost, subject);
-                        portal(subject, name);
-                    } else if (portal.direction() == Direction.Auto && field.getType() == Observable.class
-                            | portal.direction() == Direction.Reverse) {
-                        field.set(mPortalHost, subject.observeOn(AndroidSchedulers.mainThread()));
-                        reversePortal(subject, name, classForField(field));
-                    }
-                } catch (Exception e) {
-                }
+                portalFromAnnotation(field, portal);
+            }
+            ReversePortal reversePortal = field.getAnnotation(ReversePortal.class);
+            if (reversePortal != null) {
+                reversePortalFromAnnotation(field, reversePortal);
             }
         }
         this.portalsGenerated();
     }
 
+    private void portalFromAnnotation(Field field, Portal portal) {
+        try {
+            field.setAccessible(true);
+
+            Observable<?> observable = (Observable<?>) field.get(mPortalHost);
+            String name = portal.value().isEmpty() ? field.getName() : portal.value();
+            portal(observable, name);
+        } catch (Exception e) {
+        }
+    }
+
+    private void reversePortalFromAnnotation(Field field, ReversePortal reversePortal) {
+        try {
+            field.setAccessible(true);
+            PublishSubject subject = PublishSubject.create();
+            field.set(mPortalHost, subject.observeOn(AndroidSchedulers.mainThread()));
+            String name = reversePortal.value().isEmpty() ? field.getName() : reversePortal.value();
+            reversePortal(subject, name, classForField(field));
+        } catch (Exception e) {
+        }
+
+    }
+
+
     Class<?> classForField(Field field) {
         return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
     }
 
-    public <T> void portal(PublishSubject<T> subject, String name) {
+    public void portal(Observable<?> observable, String name) {
         String createScript = String.format("mrHelper.portal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(createScript, null);
 
-        subject.subscribe(input -> {
+        observable.subscribe(input -> {
             try {
                 String serializedInput = input != null ? LoganSquare.serialize(input) : "null";
                 String mirrorScript = String.format("mrHelper.activatePortal('%s', '%s', '%s')", mLoadedName, name, serializedInput);

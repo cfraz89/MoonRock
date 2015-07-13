@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by chrisfraser on 12/07/15.
+ * Created by chrisfraser on 13/07/15.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Portal {
+public @interface ReversePortal {
     String value() default "";
 }
