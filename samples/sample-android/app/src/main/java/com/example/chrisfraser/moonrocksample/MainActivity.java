@@ -10,11 +10,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.chrisfraser.moonrocksample.moonrock.annotations.Portal;
-import com.example.chrisfraser.moonrocksample.moonrock.annotations.ReversePortal;
-import com.example.chrisfraser.moonrocksample.moonrock.MoonRockModule;
-import com.example.chrisfraser.moonrocksample.moonrock.MoonRock;
 import com.example.chrisfraser.moonrocksample.models.PostList;
+import com.trogdor.moonrock.MoonRock;
+import com.trogdor.moonrock.MoonRockModule;
+import com.trogdor.moonrock.annotations.Portal;
+import com.trogdor.moonrock.annotations.ReversePortal;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

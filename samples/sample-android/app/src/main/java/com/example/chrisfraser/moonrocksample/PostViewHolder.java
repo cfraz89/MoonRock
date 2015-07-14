@@ -6,12 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by chrisfraser on 7/07/15.
  */
 public class PostViewHolder extends RecyclerView.ViewHolder {
-    private TextView mTextView1;
-    private TextView mTextView2;
+    @Bind(R.id.textView) private TextView mTextView1;
+    @Bind(R.id.textView2) private TextView mTextView2;
 
     public static PostViewHolder Create(ViewGroup viewGroup) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.post, viewGroup, false);
@@ -20,8 +23,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public PostViewHolder(View itemView) {
         super(itemView);
-        mTextView1 = (TextView) itemView.findViewById(R.id.textView);
-        mTextView2 = (TextView) itemView.findViewById(R.id.textView2);
+        ButterKnife.bind(this, itemView);
     }
 
     public void bind(String title, String body) {

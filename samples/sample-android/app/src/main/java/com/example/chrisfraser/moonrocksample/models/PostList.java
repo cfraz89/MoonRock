@@ -1,8 +1,5 @@
 package com.example.chrisfraser.moonrocksample.models;
 
-import com.bluelinelabs.logansquare.annotation.JsonField;
-import com.bluelinelabs.logansquare.annotation.JsonObject;
-
 import java.util.List;
 
 /**
