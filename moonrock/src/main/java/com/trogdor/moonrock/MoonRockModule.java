@@ -70,7 +70,7 @@ public class MoonRockModule {
     private void load(String module) {
         mLoadedName = nameForInstance(module);
         mPortalGenerator.setLoadedName(mLoadedName);
-        String loadScript = String.format("mrHelper.loadModule('%s', '%s')", module, mLoadedName);
+        String loadScript = String.format("mrhelper.loadModule('%s', '%s')", module, mLoadedName);
 
         MRStream<String> loadedStream = mMoonRock.getStreams().makeStream(mLoadedName, String.class);
         loadedStream.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(r -> {

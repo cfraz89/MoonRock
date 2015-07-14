@@ -79,13 +79,13 @@ public class MRPortalGenerator {
     }
 
     public void portal(Observable<?> observable, String name) {
-        String createScript = String.format("mrHelper.portal('%s', '%s')", mLoadedName, name);
+        String createScript = String.format("mrhelper.portal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(createScript, null);
 
         observable.observeOn(AndroidSchedulers.mainThread()).subscribe(input -> {
             try {
                 String serializedInput = input != null ? mGson.toJson(input) : "null";
-                String mirrorScript = String.format("mrHelper.activatePortal('%s', '%s', '%s')", mLoadedName, name, serializedInput);
+                String mirrorScript = String.format("mrhelper.activatePortal('%s', '%s', '%s')", mLoadedName, name, serializedInput);
                 mMoonRock.runJS(mirrorScript, null);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,19 +96,19 @@ public class MRPortalGenerator {
 
     public <T> void reversePortal(PublishSubject<T> mReverseSubject, String name, Class<T> unpackClass) {
         mMoonRock.getReversePortals().registerReverse(mReverseSubject, name, unpackClass);
-        String reverseScript = String.format("mrHelper.reversePortal('%s', '%s')", mLoadedName, name);
+        String reverseScript = String.format("mrhelper.reversePortal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(reverseScript, null);
     }
 
     //Call after forwards portals have been setup
     public void portalsGenerated() {
-        String finishedScript = String.format("mrHelper.portalsGenerated('%s')", mLoadedName);
+        String finishedScript = String.format("mrhelper.portalsGenerated('%s')", mLoadedName);
         mMoonRock.runJS(finishedScript, null);
     }
 
     //Cal after reverse portals have been linked
     public void portalsLinked() {
-        String finishedScript = String.format("mrHelper.portalsLinked('%s')", mLoadedName);
+        String finishedScript = String.format("mrhelper.portalsLinked('%s')", mLoadedName);
         mMoonRock.runJS(finishedScript, null);
     }
 
