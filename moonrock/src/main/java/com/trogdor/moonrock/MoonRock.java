@@ -162,7 +162,16 @@ public class MoonRock {
     public void destroy() {
         webView = null;
         context = null;
-        for(Map.Entry<String, MoonRockModule> module : loadedModules.entrySet())
-            module.getValue().unlinkPortals();
+        for(Map.Entry<String, MoonRockModule> moduleEntry : loadedModules.entrySet())
+            moduleEntry.getValue().unlinkPortals();
+    }
+
+    public void unload(String name) {
+        this.unload(loadedModules.get(name));
+    }
+
+    public void unload(MoonRockModule module) {
+        module.destroy();
+        loadedModules.remove(module);
     }
 }

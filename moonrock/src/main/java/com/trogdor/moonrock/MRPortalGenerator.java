@@ -1,5 +1,7 @@
 package com.trogdor.moonrock;
 
+import android.os.Bundle;
+
 import com.google.gson.Gson;
 import com.trogdor.moonrock.ReversePusher.MRReEmitReversePusher;
 import com.trogdor.moonrock.ReversePusher.MRReversePushOnSubscribe;
@@ -28,6 +30,8 @@ public class MRPortalGenerator {
 
     private List<Subscription> portalSubscriptions;
     private Map<String, MRReversePusher<?>> pushers;
+    //Pushers which will emit their last value on new/re-subscribe. This value is persisted through saveInstanceState
+    private Map<String, MRReEmitReversePusher<?>> reEmittingPushers;
 
     public MRPortalGenerator(MoonRock moonRock, Object portalHost) {
         this.moonRock = moonRock;
@@ -35,6 +39,7 @@ public class MRPortalGenerator {
         this.gson = new Gson();
         this.portalSubscriptions = new ArrayList<>(20);
         this.pushers = new HashMap<>(20);
+        this.reEmittingPushers = new HashMap<>(20);
     }
 
     public void setLoadedName(String loadedName) {
@@ -88,17 +93,19 @@ public class MRPortalGenerator {
 
     }
 
+    //Create a pusher for a reverse portal based on type
     private MRReversePusher<?> reversePusherForName(String name, Field field, ReversePortal reversePortal) {
         Class<?> clazz = classForField(field);
         MRReversePusher<?> pusher = null;
-        if (pushers.containsKey(name))
-            pusher = pushers.get(name);
-        else {
-            pusher = reversePortal.reEmit() ?
-                    new MRReEmitReversePusher<>(clazz)
-                    : new MRReversePusher<>(clazz);
-            pushers.put(name, pusher);
+
+        if(reversePortal.reEmit()) {
+            pusher = new MRReEmitReversePusher<>(clazz);
+            reEmittingPushers.put(name, (MRReEmitReversePusher<?>)pusher);
         }
+        else
+            pusher = new MRReversePusher<>(clazz);
+
+        pushers.put(name, pusher);
         return pusher;
     }
 
@@ -146,12 +153,36 @@ public class MRPortalGenerator {
         moonRock.runJS(finishedScript, null);
     }
 
-    public void unlinkPortals() {
+    public void destroyPortals() {
+        for(Map.Entry<String, MRReversePusher<?>> entry : pushers.entrySet())
+            entry.getValue().complete();
+
         for(Subscription sub : portalSubscriptions)
             sub.unsubscribe();
+
+        pushers.clear();
+        reEmittingPushers.clear();
     }
 
     public void setPortalHost(Object portalHost) {
         this.portalHost = portalHost;
+    }
+
+    public void saveInstanceState(Bundle state) {
+        for(Map.Entry<String,MRReEmitReversePusher<?>> entry : reEmittingPushers.entrySet()) {
+            String name = "reemit-"+ entry.getKey();
+            MRReEmitReversePusher<?> pusher = entry.getValue();
+            state.putString(name, pusher.getLastData());
+        }
+    }
+
+    public void restoreInstanceState(Bundle state) {
+        if (state != null) {
+            for (Map.Entry<String, MRReEmitReversePusher<?>> entry : reEmittingPushers.entrySet()) {
+                String name = "reemit-" + entry.getKey();
+                MRReEmitReversePusher<?> pusher = entry.getValue();
+                pusher.setLastData(state.getString(name));
+            }
+        }
     }
 }

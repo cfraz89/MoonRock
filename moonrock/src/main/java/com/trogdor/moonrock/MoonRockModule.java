@@ -1,5 +1,7 @@
 package com.trogdor.moonrock;
 
+import android.os.Bundle;
+
 import com.google.gson.Gson;
 import com.trogdor.moonrock.ReversePusher.MRReversePusher;
 
@@ -92,12 +94,26 @@ public class MoonRockModule {
     }
 
     public void unlinkPortals() {
-        mPortalGenerator.unlinkPortals();
+        mPortalGenerator.destroyPortals();
         setPortalHost(null);
     }
 
     public void setPortalHost(Object portalHost) {
         this.mPortalHost = portalHost;
         mPortalGenerator.setPortalHost(portalHost);
+    }
+
+    public void destroy() {
+        String unloadScript = String.format("mrhelper.unloadModule('%s')", mLoadedName);
+        mMoonRock.runJS(unloadScript, null);
+    }
+
+    public void saveInstanceState(Bundle state) {
+        mPortalGenerator.saveInstanceState(state);
+    }
+
+    public void restoreInstanceState(Bundle state) {
+        if (state != null)
+            mPortalGenerator.restoreInstanceState(state);
     }
 }
