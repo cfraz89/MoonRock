@@ -13,12 +13,12 @@ import rx.subjects.Subject;
  * Created by chrisfraser on 7/07/15.
  */
 public class MRStream<T> {
-    private Subject<T, T> mStreamSubject;
+    private MRReversePusher mPusher;
     private Class<T> mUnpackClass;
     Gson mGson;
-    public MRStream(Subject<T, T> streamSubject, Class<T> unpackClass)
+    public MRStream(MRReversePusher pusher, Class<T> unpackClass)
     {
-        mStreamSubject = streamSubject;
+        mPusher = pusher;
         mUnpackClass = unpackClass;
         mGson = new Gson();
     }
@@ -27,7 +27,7 @@ public class MRStream<T> {
             try {
                 T value = mGson.fromJson(data, mUnpackClass);
                 if (value != null)
-                    mStreamSubject.onNext(value);
+                    mPusher.push(data);
                 else {
                     String error = "Couldn't parse response: " + data;
                     Log.d("moonRock", error);

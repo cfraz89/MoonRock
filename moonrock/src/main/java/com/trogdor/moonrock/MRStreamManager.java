@@ -19,6 +19,7 @@ public class MRStreamManager {
         mStreams = new HashMap<>(100);
     }
 
+    //For data to come back from single shots
     @JavascriptInterface
     public void push(String data, String streamName) {
         mStreams.get(streamName).push(data);
@@ -28,7 +29,7 @@ public class MRStreamManager {
         return UUID.randomUUID().toString();
     }
 
-    <T> MRStream<T> makeStream(String key, Class<T> unpackClass)
+    <T> MRStream<T> makeSingleShotStream(String key, Class<T> unpackClass)
     {
         PublishSubject<T> subject = PublishSubject.create();
         MRStream<T> stream = new MRStream<>(subject, unpackClass);

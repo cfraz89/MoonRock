@@ -3,7 +3,6 @@ package com.trogdor.moonrock;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -13,12 +12,12 @@ import rx.subjects.AsyncSubject;
  * Created by chrisfraser on 8/07/15.
  */
 public class MoonRockModule {
-    private MRPortalGenerator mPortalGenerator;
-    private AsyncSubject<MoonRockModule> mReadySubject;
-    private MoonRock mMoonRock;
+    private final MRPortalGenerator mPortalGenerator;
+    private final AsyncSubject<MoonRockModule> mReadySubject;
+    private final MoonRock mMoonRock;
     private Object mPortalHost;
-    String mLoadedName;
-    private Gson mGson;
+    private final String mLoadedName;
+    private final Gson mGson;
 
     public MoonRockModule(MoonRock moonRock, String module, String instanceName, Object portalHost, AsyncSubject<MoonRockModule> readySubject) {
         mMoonRock = moonRock;
@@ -44,7 +43,7 @@ public class MoonRockModule {
             return Observable.error(e);
         }
 
-        MRStream<T> resultStream = streamManager.makeStream(streamKey, unpackClass);
+        MRStream<T> resultStream = streamManager.makeSingleShotStream(streamKey, unpackClass);
         mMoonRock.getWebView().evaluateJavascript(script, result -> {
             if (result != "null")
                 resultStream.push(result);
@@ -68,7 +67,7 @@ public class MoonRockModule {
         mPortalGenerator.setLoadedName(mLoadedName);
         String loadScript = String.format("mrhelper.loadModule('%s', '%s')", module, mLoadedName);
 
-        MRStream<String> loadedStream = mMoonRock.getStreams().makeStream(mLoadedName, String.class);
+        MRStream<String> loadedStream = mMoonRock.getStreams().makeSingleShotStream(mLoadedName, String.class);
         loadedStream.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(r -> {
             mReadySubject.onNext(this);
             mReadySubject.onCompleted();
@@ -95,9 +94,11 @@ public class MoonRockModule {
 
     public void unlinkPortals() {
         mPortalGenerator.unlinkPortals();
+        setPortalHost(null);
     }
 
     public void setPortalHost(Object portalHost) {
         this.mPortalHost = portalHost;
+        mPortalGenerator.setPortalHost(portalHost);
     }
 }

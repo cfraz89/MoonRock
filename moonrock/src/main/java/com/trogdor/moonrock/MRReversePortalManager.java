@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import rx.subjects.PublishSubject;
+import rx.subjects.Subject;
 
 /**
  * Created by chrisfraser on 11/07/15.
@@ -23,7 +24,7 @@ public class MRReversePortalManager {
         subject.push(data);
     }
 
-    public <T> void registerReverse(PublishSubject mReverseSubject, String name, Class<T> unpackClass) {
+    public <T> void registerReverse(<T, T> mReverseSubject, String name, Class<T> unpackClass) {
         MRStream<T> stream = new MRStream<>(mReverseSubject, unpackClass);
         mReverseMap.put(name, stream);
     }

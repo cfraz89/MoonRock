@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscription;
@@ -16,10 +17,12 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.android.view.OnClickEvent;
 import rx.android.widget.OnTextChangeEvent;
 import rx.subjects.PublishSubject;
+import rx.subjects.ReplaySubject;
+import rx.subjects.Subject;
 
 public class MRPortalGenerator {
     private final MoonRock mMoonRock;
-    private final Object mPortalHost;
+    private Object mPortalHost;
     private final Gson mGson;
 
     private String mLoadedName;
@@ -101,7 +104,7 @@ public class MRPortalGenerator {
         portalSubscriptions.add(sub);
     }
 
-    public <T> void reversePortal(PublishSubject<T> mReverseSubject, String name, Class<T> unpackClass) {
+    public <T> void reversePortal(Subject<T, T> mReverseSubject, String name, Class<T> unpackClass) {
         mMoonRock.getReversePortals().registerReverse(mReverseSubject, name, unpackClass);
         String reverseScript = String.format("mrhelper.reversePortal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(reverseScript, null);
@@ -122,5 +125,9 @@ public class MRPortalGenerator {
     public void unlinkPortals() {
         for(Subscription sub : portalSubscriptions)
             sub.unsubscribe();
+    }
+
+    public void setPortalHost(Object portalHost) {
+        this.mPortalHost = portalHost;
     }
 }

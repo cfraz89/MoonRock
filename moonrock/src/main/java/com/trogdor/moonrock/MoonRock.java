@@ -88,7 +88,7 @@ public class MoonRock {
 
     private void load() {
         addDefaultExtensions();
-        mStreamManager.makeStream("moonrock-configured", Boolean.class).getObservable().subscribe(b -> {
+        mStreamManager.makeSingleShotStream("moonrock-configured", Boolean.class).getObservable().subscribe(b -> {
             mReadySubject.onNext(this);
             mReadySubject.onCompleted();
         });
