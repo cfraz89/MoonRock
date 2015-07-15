@@ -73,10 +73,11 @@ public class MRPortalGenerator {
     private void reversePortalFromAnnotation(Field field, ReversePortal reversePortal) {
         try {
             field.setAccessible(true);
-            PublishSubject subject = PublishSubject.create();
+            MRReversePusher<?> pusher = new MRReversePusher<>(classForField(field));
+            Observable<?> subject = Observable.create(new MRReversePushOnSubscribe<>(pusher));
             field.set(mPortalHost, subject.observeOn(AndroidSchedulers.mainThread()));
             String name = reversePortal.value().isEmpty() ? field.getName() : reversePortal.value();
-            reversePortal(subject, name, classForField(field));
+            reversePortal(name, pusher);
         } catch (Exception e) {
         }
 
@@ -104,8 +105,8 @@ public class MRPortalGenerator {
         portalSubscriptions.add(sub);
     }
 
-    public <T> void reversePortal(Subject<T, T> mReverseSubject, String name, Class<T> unpackClass) {
-        mMoonRock.getReversePortals().registerReverse(mReverseSubject, name, unpackClass);
+    public <T> void reversePortal(String name, MRReversePusher pusher) {
+        mMoonRock.getReversePortals().registerReverse(name, pusher);
         String reverseScript = String.format("mrhelper.reversePortal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(reverseScript, null);
     }

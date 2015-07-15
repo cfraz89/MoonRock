@@ -21,97 +21,97 @@ public class MoonRock {
     static final String DefaultBase = "file:///android_asset";
     static final String DefaultPage = "moonrock.html";
 
-    private WebView mWebView;
-    private Context mContext;
-    private MRStreamManager mStreamManager;
-    private MRReversePortalManager mMRReversePortalManager;
+    private WebView webView;
+    private Context context;
+    private MRStreamManager streamManager;
+    private MRReversePortalManager reversePortalManager;
 
-    private AsyncSubject<MoonRock> mReadySubject;
+    private AsyncSubject<MoonRock> readySubject;
 
-    private Map<String, MoonRockModule> mLoadedModules;
+    private Map<String, MoonRockModule> loadedModules;
 
-    private boolean mNeedsLoad;
-    private String mPageUrl;
-    private String mBaseUrl;
+    private boolean needsLoad;
+    private String pageUrl;
+    private String baseUrl;
 
     public MoonRock(Context context)
     {
-        mContext = context;
-        mBaseUrl = DefaultBase;
-        mPageUrl = DefaultPage;
-        mStreamManager = new MRStreamManager();
-        mMRReversePortalManager = new MRReversePortalManager();
-        mLoadedModules = new HashMap<>();
-        mWebView = new WebView(mContext);
+        this.context = context;
+        baseUrl = DefaultBase;
+        pageUrl = DefaultPage;
+        streamManager = new MRStreamManager();
+        reversePortalManager = new MRReversePortalManager();
+        loadedModules = new HashMap<>();
+        webView = new WebView(this.context);
         setupWebView();
-        mReadySubject = AsyncSubject.create();
-        mNeedsLoad = true;
+        readySubject = AsyncSubject.create();
+        needsLoad = true;
     }
 
     private void setupWebView() {
-        mWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-        mWebView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+        webView.getSettings().setJavaScriptEnabled(true);
         MoonRock self = this;
-        mWebView.setWebViewClient(new WebViewClient() {
+        webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                String config = String.format("System.config({baseURL:'%s'})", mBaseUrl);
+                String config = String.format("System.config({baseURL:'%s'})", baseUrl);
                 view.evaluateJavascript(config, null);
             }
         });
     }
 
     private void addDefaultExtensions() {
-        mWebView.addJavascriptInterface(mStreamManager, "streamInterface");
-        mWebView.addJavascriptInterface(mMRReversePortalManager, "reversePortalInterface");
+        webView.addJavascriptInterface(streamManager, "streamInterface");
+        webView.addJavascriptInterface(reversePortalManager, "reversePortalInterface");
     }
 
     public Observable<MoonRock> ready() {
-        return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
+        return readySubject.observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<MoonRockModule> loadModule(String module, String instance, Object portalHost) {
-        if (mNeedsLoad) {
+        if (needsLoad) {
             load();
         }
         AsyncSubject<MoonRockModule> readySubject = AsyncSubject.create();
         loadModule(module, instance, portalHost, readySubject);
-        return readySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
+        return readySubject.observeOn(AndroidSchedulers.mainThread());
     }
 
     public void registerExtensions(Map<Object, String> extensions) {
         if (extensions != null) {
             for (Map.Entry<Object, String> extension : extensions.entrySet())
-                mWebView.addJavascriptInterface(extension.getKey(), extension.getValue());
+                webView.addJavascriptInterface(extension.getKey(), extension.getValue());
         }
     }
 
     private void load() {
         addDefaultExtensions();
-        mStreamManager.makeSingleShotStream("moonrock-configured", Boolean.class).getObservable().subscribe(b -> {
-            mReadySubject.onNext(this);
-            mReadySubject.onCompleted();
+        MRReversePusher<?> pusher = new MRSingleShotReversePusher<>(null);
+        streamManager.openStream("moonrock-configured", pusher).subscribe(b -> {
+            readySubject.onNext(this);
+            readySubject.onCompleted();
         });
-        mNeedsLoad = false;
-        mWebView.loadUrl(mBaseUrl + "/" + mPageUrl);
+        needsLoad = false;
+        webView.loadUrl(baseUrl + "/" + pageUrl);
     }
 
     public void loadModule(String moduleName, String instanceName, Object portalHost, AsyncSubject<MoonRockModule> moduleReadySubject) {
-        if (mNeedsLoad) {
+        if (needsLoad) {
             load();
         }
-        mReadySubject.observeOn(AndroidSchedulers.mainThread()).subscribe(moonRock -> {
+        readySubject.observeOn(AndroidSchedulers.mainThread()).subscribe(moonRock -> {
             String instance = moduleNameForInstance(moduleName, instanceName);
             //If module already loaded, use that
-            if (mLoadedModules.containsKey(instance)) {
-                MoonRockModule module = mLoadedModules.get(instance);
+            if (loadedModules.containsKey(instance)) {
+                MoonRockModule module = loadedModules.get(instance);
                 module.setPortalHost(portalHost);
-                moduleReadySubject.onNext(mLoadedModules.get(instance));
+                moduleReadySubject.onNext(loadedModules.get(instance));
                 moduleReadySubject.onCompleted();
-            }
-            else {
+            } else {
                 new MoonRockModule(this, moduleName, instance, portalHost, moduleReadySubject).ready().subscribe(module -> {
-                    mLoadedModules.put(module.getLoadedName(), module);
+                    loadedModules.put(module.getLoadedName(), module);
                 });
             }
         });
@@ -123,43 +123,43 @@ public class MoonRock {
     }
 
     public MoonRockModule getModule(String loadedName) {
-        return mLoadedModules.get(loadedName);
+        return loadedModules.get(loadedName);
     }
 
     public MRStreamManager getStreams() {
-        return mStreamManager;
+        return streamManager;
     }
 
-    public MRReversePortalManager getReversePortals() { return mMRReversePortalManager; }
+    public MRReversePortalManager getReversePortals() { return reversePortalManager; }
 
     public WebView getWebView() {
-        return mWebView;
+        return webView;
     }
 
     public void runJS(String script, ValueCallback<String> callback) {
-        mWebView.evaluateJavascript(script, callback);
+        webView.evaluateJavascript(script, callback);
     }
 
     public String getPageUrl() {
-        return mPageUrl;
+        return pageUrl;
     }
 
     public void setPageUrl(String mPageUrl) {
-        this.mPageUrl = mPageUrl;
+        this.pageUrl = mPageUrl;
     }
 
     public String getBaseUrl() {
-        return mBaseUrl;
+        return baseUrl;
     }
 
     public void setBaseUrl(String mBaseUrl) {
-        this.mBaseUrl = mBaseUrl;
+        this.baseUrl = mBaseUrl;
     }
 
     public void destroy() {
-        mWebView = null;
-        mContext = null;
-        for(Map.Entry<String, MoonRockModule> module : mLoadedModules.entrySet())
+        webView = null;
+        context = null;
+        for(Map.Entry<String, MoonRockModule> module : loadedModules.entrySet())
             module.getValue().unlinkPortals();
     }
 }

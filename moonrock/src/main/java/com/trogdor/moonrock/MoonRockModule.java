@@ -43,12 +43,13 @@ public class MoonRockModule {
             return Observable.error(e);
         }
 
-        MRStream<T> resultStream = streamManager.makeSingleShotStream(streamKey, unpackClass);
+        MRReversePusher<T> pusher = new MRReversePusher<>(unpackClass);
+        Observable<T> resultObservable = streamManager.openStream(streamKey, pusher);
         mMoonRock.getWebView().evaluateJavascript(script, result -> {
             if (result != "null")
-                resultStream.push(result);
+                pusher.pushJson(result);
         });
-        return resultStream.getObservable().observeOn(AndroidSchedulers.mainThread());
+        return resultObservable;
     }
 
     private String makeFunctionInvocation(String functionName, String streamKey, Object[] args) throws IOException {
@@ -67,17 +68,14 @@ public class MoonRockModule {
         mPortalGenerator.setLoadedName(mLoadedName);
         String loadScript = String.format("mrhelper.loadModule('%s', '%s')", module, mLoadedName);
 
-        MRStream<String> loadedStream = mMoonRock.getStreams().makeSingleShotStream(mLoadedName, String.class);
-        loadedStream.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(r -> {
+        MRReversePusher<String> pusher = new MRReversePusher<>(String.class);
+        Observable<String> loaded = mMoonRock.getStreams().openStream(mLoadedName, pusher);
+        loaded.subscribe(r -> {
             mReadySubject.onNext(this);
             mReadySubject.onCompleted();
         });
 
         mMoonRock.runJS(loadScript, null);
-    }
-
-    public <T> void subscribeOnActivity(Observable<T> observable) {
-
     }
 
     public String getLoadedName() {

@@ -5,6 +5,8 @@ import android.webkit.JavascriptInterface;
 import java.util.HashMap;
 import java.util.UUID;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
 
 /**
@@ -13,31 +15,27 @@ import rx.subjects.PublishSubject;
 
 //Transient observables for one time function to return to java
 public class MRStreamManager {
-    public HashMap<String, MRStream> mStreams;
+    public HashMap<String, MRReversePusher> pushers;
 
     public MRStreamManager() {
-        mStreams = new HashMap<>(100);
+        pushers = new HashMap<>(100);
     }
 
     //For data to come back from single shots
     @JavascriptInterface
     public void push(String data, String streamName) {
-        mStreams.get(streamName).push(data);
+        pushers.get(streamName).push(data);
     }
 
     public String makeKey() {
         return UUID.randomUUID().toString();
     }
 
-    <T> MRStream<T> makeSingleShotStream(String key, Class<T> unpackClass)
+    <T> Observable<T> openStream(String key, MRReversePusher<T> pusher)
     {
-        PublishSubject<T> subject = PublishSubject.create();
-        MRStream<T> stream = new MRStream<>(subject, unpackClass);
-        mStreams.put(key, stream);
-        //Don't need to track it once its done a push
-        stream.getObservable().subscribe(o -> {
-            mStreams.remove(key);
-        });
-        return stream;
+        MRReversePushOnSubscribe<T> onSubscribe = new MRReversePushOnSubscribe<>(pusher);
+        Observable<T> observable = Observable.create(onSubscribe);
+        pushers.put(key, pusher);
+        return observable.observeOn(AndroidSchedulers.mainThread());
     }
 }

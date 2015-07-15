@@ -12,20 +12,19 @@ import rx.subjects.Subject;
  * Created by chrisfraser on 11/07/15.
  */
 public class MRReversePortalManager {
-    Map<String, MRStream> mReverseMap;
+    Map<String, MRReversePusher> reverseMap;
 
     public MRReversePortalManager() {
-        mReverseMap = new HashMap<>(100);
+        reverseMap = new HashMap<>(100);
     }
 
     @JavascriptInterface
     public void onNext(String data, String name) {
-        MRStream subject = mReverseMap.get(name);
-        subject.push(data);
+        MRReversePusher pusher = reverseMap.get(name);
+        pusher.pushJson(data);
     }
 
-    public <T> void registerReverse(<T, T> mReverseSubject, String name, Class<T> unpackClass) {
-        MRStream<T> stream = new MRStream<>(mReverseSubject, unpackClass);
-        mReverseMap.put(name, stream);
+    public <T> void registerReverse(String name, MRReversePusher<T> pusher) {
+        reverseMap.put(name, pusher);
     }
 }
