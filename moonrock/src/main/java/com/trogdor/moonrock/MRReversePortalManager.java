@@ -2,11 +2,10 @@ package com.trogdor.moonrock;
 
 import android.webkit.JavascriptInterface;
 
+import com.trogdor.moonrock.ReversePusher.MRReversePusher;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import rx.subjects.PublishSubject;
-import rx.subjects.Subject;
 
 /**
  * Created by chrisfraser on 11/07/15.
