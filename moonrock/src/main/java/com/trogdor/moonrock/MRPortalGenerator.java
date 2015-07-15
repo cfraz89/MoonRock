@@ -7,8 +7,11 @@ import com.trogdor.moonrock.annotations.ReversePortal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.android.view.OnClickEvent;
 import rx.android.widget.OnTextChangeEvent;
@@ -21,10 +24,13 @@ public class MRPortalGenerator {
 
     private String mLoadedName;
 
+    private List<Subscription> portalSubscriptions;
+
     public MRPortalGenerator(MoonRock moonRock, Object portalHost) {
         this.mMoonRock = moonRock;
         this.mPortalHost = portalHost;
         this.mGson = new Gson();
+        this.portalSubscriptions = new ArrayList<>(20);
     }
 
     public void setLoadedName(String loadedName) {
@@ -82,7 +88,7 @@ public class MRPortalGenerator {
         String createScript = String.format("mrhelper.portal('%s', '%s')", mLoadedName, name);
         mMoonRock.runJS(createScript, null);
 
-        observable.observeOn(AndroidSchedulers.mainThread()).subscribe(input -> {
+        Subscription sub = observable.observeOn(AndroidSchedulers.mainThread()).subscribe(input -> {
             try {
                 String serializedInput = input != null ? mGson.toJson(input) : "null";
                 String mirrorScript = String.format("mrhelper.activatePortal('%s', '%s', '%s')", mLoadedName, name, serializedInput);
@@ -92,6 +98,7 @@ public class MRPortalGenerator {
             }
 
         });
+        portalSubscriptions.add(sub);
     }
 
     public <T> void reversePortal(PublishSubject<T> mReverseSubject, String name, Class<T> unpackClass) {
@@ -112,5 +119,8 @@ public class MRPortalGenerator {
         mMoonRock.runJS(finishedScript, null);
     }
 
-
+    public void unlinkPortals() {
+        for(Subscription sub : portalSubscriptions)
+            sub.unsubscribe();
+    }
 }

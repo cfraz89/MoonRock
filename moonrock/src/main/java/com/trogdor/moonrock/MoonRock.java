@@ -70,12 +70,12 @@ public class MoonRock {
         return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MoonRockModule> loadModule(String module, Object portalHost) {
+    public Observable<MoonRockModule> loadModule(String module, String instance, Object portalHost) {
         if (mNeedsLoad) {
             load();
         }
         AsyncSubject<MoonRockModule> readySubject = AsyncSubject.create();
-        loadModule(module, portalHost, readySubject);
+        loadModule(module, instance, portalHost, readySubject);
         return readySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -93,17 +93,33 @@ public class MoonRock {
             mReadySubject.onCompleted();
         });
         mNeedsLoad = false;
-        mWebView.loadUrl(mBaseUrl+"/"+mPageUrl);
+        mWebView.loadUrl(mBaseUrl + "/" + mPageUrl);
     }
 
-    public void loadModule(String moduleName, Object portalHost, AsyncSubject<MoonRockModule> moduleReadySubject) {
+    public void loadModule(String moduleName, String instanceName, Object portalHost, AsyncSubject<MoonRockModule> moduleReadySubject) {
         if (mNeedsLoad) {
             load();
         }
         mReadySubject.observeOn(AndroidSchedulers.mainThread()).subscribe(moonRock -> {
-            MoonRockModule module = new MoonRockModule(this, moduleName, portalHost, moduleReadySubject);
-            mLoadedModules.put(module.getLoadedName(), module);
+            String instance = moduleNameForInstance(moduleName, instanceName);
+            //If module already loaded, use that
+            if (mLoadedModules.containsKey(instance)) {
+                MoonRockModule module = mLoadedModules.get(instance);
+                module.setPortalHost(portalHost);
+                moduleReadySubject.onNext(mLoadedModules.get(instance));
+                moduleReadySubject.onCompleted();
+            }
+            else {
+                new MoonRockModule(this, moduleName, instance, portalHost, moduleReadySubject).ready().subscribe(module -> {
+                    mLoadedModules.put(module.getLoadedName(), module);
+                });
+            }
         });
+    }
+
+
+    private String moduleNameForInstance(String module, String instanceName) {
+        return String.format("instance_%s_%s", module.replace("/", "_"), instanceName);
     }
 
     public MoonRockModule getModule(String loadedName) {
@@ -138,5 +154,12 @@ public class MoonRock {
 
     public void setBaseUrl(String mBaseUrl) {
         this.mBaseUrl = mBaseUrl;
+    }
+
+    public void destroy() {
+        mWebView = null;
+        mContext = null;
+        for(Map.Entry<String, MoonRockModule> module : mLoadedModules.entrySet())
+            module.getValue().unlinkPortals();
     }
 }

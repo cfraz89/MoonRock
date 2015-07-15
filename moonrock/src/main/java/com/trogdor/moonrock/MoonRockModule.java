@@ -20,11 +20,12 @@ public class MoonRockModule {
     String mLoadedName;
     private Gson mGson;
 
-    public MoonRockModule(MoonRock moonRock, String module, Object portalHost, AsyncSubject<MoonRockModule> readySubject) {
+    public MoonRockModule(MoonRock moonRock, String module, String instanceName, Object portalHost, AsyncSubject<MoonRockModule> readySubject) {
         mMoonRock = moonRock;
         mReadySubject = readySubject;
         mPortalGenerator = new MRPortalGenerator(moonRock, portalHost);
         mGson = new Gson();
+        mLoadedName = instanceName;
         load(module);
     }
 
@@ -63,12 +64,7 @@ public class MoonRockModule {
         return mReadySubject.asObservable().observeOn(AndroidSchedulers.mainThread());
     }
 
-    private String nameForInstance(String module) {
-        return String.format("instance_%s_%s", module.replace("/", "_"), UUID.randomUUID().toString().replace("-", "_"));
-    }
-
     private void load(String module) {
-        mLoadedName = nameForInstance(module);
         mPortalGenerator.setLoadedName(mLoadedName);
         String loadScript = String.format("mrhelper.loadModule('%s', '%s')", module, mLoadedName);
 
@@ -91,5 +87,17 @@ public class MoonRockModule {
 
     public MRPortalGenerator getPortalGenerator() {
         return mPortalGenerator;
+    }
+
+    public void generatePortals() {
+        mPortalGenerator.generatePortals();
+    }
+
+    public void unlinkPortals() {
+        mPortalGenerator.unlinkPortals();
+    }
+
+    public void setPortalHost(Object portalHost) {
+        this.mPortalHost = portalHost;
     }
 }
