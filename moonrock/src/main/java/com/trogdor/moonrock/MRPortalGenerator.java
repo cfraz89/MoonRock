@@ -160,6 +160,7 @@ public class MRPortalGenerator {
         for(Subscription sub : portalSubscriptions)
             sub.unsubscribe();
 
+        portalSubscriptions.clear();
         pushers.clear();
         reEmittingPushers.clear();
     }
