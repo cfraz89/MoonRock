@@ -48,7 +48,7 @@ public class MoonRockModule {
 
         MRReversePusher<T> pusher = new MRReversePusher<>(unpackClass);
         Observable<T> resultObservable = streamManager.openStream(streamKey, pusher);
-        mMoonRock.getWebView().evaluateJavascript(script, result -> {
+        mMoonRock.runJS(script, result -> {
             if (result != "null")
                 pusher.pushJson(result);
         });

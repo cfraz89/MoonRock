@@ -58,8 +58,8 @@ public class MoonRock {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                String config = String.format("System.config({baseURL:'%s'})", baseUrl);
-                view.evaluateJavascript(config, null);
+                    String config = String.format("prep('%s', 'android')", baseUrl);
+                    view.evaluateJavascript(config, null);
             }
         });
     }
@@ -73,13 +73,28 @@ public class MoonRock {
         return readySubject.observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MoonRockModule> loadModule(String module, String instance, Object portalHost) {
+    public Observable<MoonRockModule> loadModule(String moduleName, String instanceName, Object portalHost) {
         if (needsLoad) {
             load();
         }
-        AsyncSubject<MoonRockModule> readySubject = AsyncSubject.create();
-        loadModule(module, instance, portalHost, readySubject);
-        return readySubject.observeOn(AndroidSchedulers.mainThread());
+        AsyncSubject<MoonRockModule> moduleReady = AsyncSubject.create();
+
+        readySubject.observeOn(AndroidSchedulers.mainThread()).subscribe(moonRock -> {
+            String instance = moduleNameForInstance(moduleName, instanceName);
+            //If module already loaded, use that
+            if (loadedModules.containsKey(instance)) {
+                MoonRockModule module = loadedModules.get(instance);
+                module.setPortalHost(portalHost);
+                moduleReady.onNext(loadedModules.get(instance));
+                moduleReady.onCompleted();
+            } else {
+                new MoonRockModule(this, moduleName, instance, portalHost, moduleReady).ready().subscribe(module -> {
+                    loadedModules.put(module.getLoadedName(), module);
+                });
+            }
+        });
+
+        return moduleReady.observeOn(AndroidSchedulers.mainThread());
     }
 
     public void registerExtensions(Map<Object, String> extensions) {
@@ -104,20 +119,7 @@ public class MoonRock {
         if (needsLoad) {
             load();
         }
-        readySubject.observeOn(AndroidSchedulers.mainThread()).subscribe(moonRock -> {
-            String instance = moduleNameForInstance(moduleName, instanceName);
-            //If module already loaded, use that
-            if (loadedModules.containsKey(instance)) {
-                MoonRockModule module = loadedModules.get(instance);
-                module.setPortalHost(portalHost);
-                moduleReadySubject.onNext(loadedModules.get(instance));
-                moduleReadySubject.onCompleted();
-            } else {
-                new MoonRockModule(this, moduleName, instance, portalHost, moduleReadySubject).ready().subscribe(module -> {
-                    loadedModules.put(module.getLoadedName(), module);
-                });
-            }
-        });
+
     }
 
 
